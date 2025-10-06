@@ -23,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false, isOpen = false, onC
   if (!isMobile) {
     return (
       <aside className="bg-blue-900 text-white w-64 min-h-screen flex flex-col">
-        <div className="text-2xl font-bold py-4 px-6 border-b border-blue-800">Modules</div>
+        <div className="text-2xl font-bold py-4 px-6 border-b border-blue-800">Discover Group</div>
         <div className="px-4 py-3">
           <input
             type="text"
