@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Optional: Custom scrollbar styling for dashboard tables */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #f0f4f8;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
