@@ -5,16 +5,16 @@ export interface PayableItem {
   id: string;
   name: string;
   status: Status;
-  createdAt: string;        // date/time string
-  paymentDeadline?: string; // date/time string
+  createdAt: string;
+  paymentDeadline?: string;
   category?: string;
   supplier?: string;
   total?: number;
   paid?: number;
   balance?: number;
-  currency?: string;        // e.g., "USD", "PHP"
-  travelDate?: string;      // "MM/DD/YYYY - MM/DD/YYYY"
-  note?: string;            // e.g., "New", "Done", "Partially Paid"
+  currency?: string;
+  travelDate?: string;
+  note?: string;
 }
 
 interface KanbanBoardProps {
@@ -22,10 +22,11 @@ interface KanbanBoardProps {
   filterText?: string;
   onMove: (id: string, toStatus: Status) => void;
   onAdd?: (status: Status) => void;
-  onOpen?: (id: string) => void; // open modal for given id
+  onOpen?: (id: string) => void;
 }
 
-const colWidth = "w-[22rem]";
+// Responsive column width
+const colWidth = "w-72 sm:w-80 md:w-96 lg:w-[22rem]";
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ items, filterText = "", onMove, onAdd, onOpen }) => {
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -75,15 +76,17 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ items, filterText = "", onMov
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, status)}
             >
+              {/* Column header */}
               <div className="px-3 py-2 border-b flex items-center gap-2">
-                <div className="font-semibold text-gray-800">{status}</div>
+                <div className="font-semibold text-gray-800 truncate">{status}</div>
                 <div className="ml-auto flex items-center gap-2">
-                  <div className="hidden sm:block w-24 h-2 rounded bg-gray-200 overflow-hidden">
+                  {/* small progress bar */}
+                  <div className="hidden sm:block w-20 h-2 rounded bg-gray-200 overflow-hidden">
                     <div className="h-2 bg-green-500" style={{ width: `${Math.min(100, (list.length / 10) * 100)}%` }} />
                   </div>
                   <button
                     className="text-gray-500 hover:text-gray-800"
-                    title="Add new in this column"
+                    title="Add"
                     onClick={() => onAdd?.(status)}
                     type="button"
                   >
@@ -92,11 +95,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ items, filterText = "", onMov
                 </div>
               </div>
 
+              {/* Column total */}
               <div className="px-3 pt-2 text-xs text-gray-500">
                 Total: {colTotal.toLocaleString(undefined, { style: "currency", currency: (list[0]?.currency || "USD") })}
               </div>
 
-              <div className="p-2 space-y-2 overflow-y-auto max-h-[70vh]">
+              {/* Cards */}
+              <div className="p-2 space-y-2 overflow-y-auto max-h-[65vh]">
                 {list.map((card) => (
                   <article
                     key={card.id}
@@ -111,7 +116,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ items, filterText = "", onMov
                   >
                     <div className="flex items-start gap-2">
                       <span title="star" className="text-yellow-500">★</span>
-                      <div className="font-medium leading-snug">{card.name}</div>
+                      <div className="font-medium leading-snug line-clamp-2">{card.name}</div>
                     </div>
 
                     {card.note && <div className="italic text-gray-700 mt-1">{card.note}</div>}

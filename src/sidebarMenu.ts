@@ -1,4 +1,5 @@
 export interface SidebarMenuItem {
+  priority?: number;
   label: string;
   key: string; // unique identifier, e.g. "arap", "banks"
   icon?: React.ReactNode; // You can add icons later

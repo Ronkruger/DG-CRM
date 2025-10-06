@@ -326,9 +326,13 @@ const PayableModal: React.FC<Props> = ({ open, onClose, onSave, mode = "create",
                 <Labeled label="Payment Deadline" required>
                   <input type="date" className="w-full border rounded px-2 py-1" value={form.paymentDeadline} onChange={(e) => update("paymentDeadline", e.target.value)} />
                 </Labeled>
-                <Labeled label="Category">
-                  <input className="w-full border rounded px-2 py-1" value={form.category} onChange={(e) => update("category", e.target.value)} />
-                </Labeled>
+               <Labeled label="Category">
+  <input
+    className="w-full border rounded px-2 py-1"
+    value={form.category}
+    onChange={(e) => update("category", e.target.value)}
+  />
+</Labeled>
                 <Labeled label="Package">
                   <input className="w-full border rounded px-2 py-1" value={form.package} onChange={(e) => update("package", e.target.value)} />
                 </Labeled>

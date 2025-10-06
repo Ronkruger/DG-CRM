@@ -3,20 +3,18 @@ import StatusTabs, { type Status } from "../components/StatusTabs";
 import KanbanBoard, { type PayableItem } from "../components/KanbanBoard";
 import PayableModal, { type NewPayableForm, emptyPayableForm } from "../components/PayableModal";
 
-const FIXED_STRIP_WIDTH = "w-[1280px]";
+const STRIP_MIN = "min-w-[640px] md:min-w-[960px] lg:min-w-[1200px]";
 
 const ARAPBookingPage: React.FC = () => {
   const [statusTab, setStatusTab] = useState<Status>("New");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterText, setFilterText] = useState("");
 
-  // Track whether modal is in create or edit mode and which record is selected
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [initialForm, setInitialForm] = useState<NewPayableForm | null>(null);
 
   const [items, setItems] = useState<PayableItem[]>([
-    // Seeded demo data (same as before)...
     {
       id: crypto.randomUUID(),
       name: "★ MDELJ - ADVANCE PAYMENT FOR SOHAN - JUNE 20, 2025",
@@ -102,7 +100,6 @@ const ARAPBookingPage: React.FC = () => {
     setItems((prev) => prev.map((it) => (it.id === id ? { ...it, status: toStatus } : it)));
   };
 
-  // Open modal in Create mode
   const openCreateModal = () => {
     setModalMode("create");
     setSelectedId(null);
@@ -110,7 +107,6 @@ const ARAPBookingPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  // Open modal in Edit mode for a specific item
   const openEditModal = (id: string) => {
     const it = items.find((x) => x.id === id);
     if (!it) return;
@@ -120,10 +116,8 @@ const ARAPBookingPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  // Save handler for both modes
   const handleSave = (data: NewPayableForm) => {
     if (modalMode === "edit" && selectedId) {
-      // Update existing item
       setItems((prev) =>
         prev.map((it) =>
           it.id === selectedId
@@ -147,7 +141,6 @@ const ARAPBookingPage: React.FC = () => {
         )
       );
     } else {
-      // Create new item (always lands in "New" column by design)
       const total = Number(data.totalAmount || 0);
       const paid = Number(data.amountPaid || 0);
       const currency = data.currency || "USD";
@@ -180,14 +173,15 @@ const ARAPBookingPage: React.FC = () => {
   }, [items]);
 
   return (
-    <div className="p-4 md:p-6 space-y-4">
-      {/* Left-aligned fixed-width strips */}
+    <div className="p-3 md:p-6 space-y-4">
+      {/* Title strip */}
       <div className="overflow-x-auto">
-        <div className={`${FIXED_STRIP_WIDTH} max-w-none`}>
+        <div className={`${STRIP_MIN}`}>
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded-full text-xs bg-pink-100 text-pink-700 border border-pink-200">New</span>
             <span className="text-sm text-gray-600">Payable</span>
             <span className="text-xs text-gray-500">Board</span>
+
             <div className="ml-auto flex items-center gap-2">
               <button className="p-2 rounded hover:bg-gray-100" title="Settings">⚙️</button>
               <button className="p-2 rounded hover:bg-gray-100" title="Refresh">⟳</button>
@@ -200,8 +194,9 @@ const ARAPBookingPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Tabs + counts (hide on small) */}
       <div className="overflow-x-auto hidden xl:block">
-        <div className={`${FIXED_STRIP_WIDTH} max-w-none`}>
+        <div className={`${STRIP_MIN}`}>
           <StatusTabs value={statusTab} onChange={setStatusTab} />
           <div className="text-xs text-gray-500 mt-1">
             {Object.entries(counts).map(([k, v]) => (
@@ -213,8 +208,9 @@ const ARAPBookingPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Search */}
       <div className="overflow-x-auto">
-        <div className={`${FIXED_STRIP_WIDTH} max-w-none`}>
+        <div className={`${STRIP_MIN}`}>
           <input
             type="search"
             placeholder="Search..."
@@ -225,7 +221,7 @@ const ARAPBookingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Kanban board with card click handler */}
+      {/* Board */}
       <KanbanBoard
         items={items}
         filterText={filterText}
@@ -234,7 +230,7 @@ const ARAPBookingPage: React.FC = () => {
         onOpen={(id) => openEditModal(id)}
       />
 
-      {/* Modal; initial is set for edit, empty for create; mode toggles pill behavior */}
+      {/* Modal */}
       <PayableModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -248,18 +244,15 @@ const ARAPBookingPage: React.FC = () => {
 
 export default ARAPBookingPage;
 
-// Helper to map a board item into the full modal form shape (best-effort)
+// Map item to form
 function mapItemToForm(it: PayableItem): NewPayableForm {
-  // Attempt to split travelDate "MM/DD/YYYY - MM/DD/YYYY"
   let travelFrom = "";
   let travelTo = "";
   if (it.travelDate && it.travelDate.includes(" - ")) {
     const [a, b] = it.travelDate.split(" - ");
-    // Keep as locale strings; the <input type="date"> expects yyyy-mm-dd; convert best-effort.
     travelFrom = toISODateFromLocale(a);
     travelTo = toISODateFromLocale(b);
   }
-
   return {
     name: it.name || "",
     dateCreated: toISODateFromLocale(it.createdAt) || "",
@@ -273,7 +266,7 @@ function mapItemToForm(it: PayableItem): NewPayableForm {
     amountPaid: typeof it.paid === "number" ? it.paid : "",
     status: it.status,
     currency: it.currency || "USD",
-    datePayable: "", // optional; unknown from card
+    datePayable: "",
     details: "",
     invoiceFile: null,
     invoiceNumber: "",
@@ -291,7 +284,6 @@ function mapItemToForm(it: PayableItem): NewPayableForm {
 }
 
 function toISODateFromLocale(input: string): string {
-  // Accepts strings like "07/09/2025 15:22:40" or "07/09/2025" and returns "2025-07-09"
   if (!input) return "";
   const m = input.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (!m) return "";
